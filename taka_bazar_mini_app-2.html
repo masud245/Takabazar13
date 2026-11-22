@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Taka Bazar Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--orange:#1648e8;--orange2:#5c16c5;--ink:#1e2438;--muted:#6c758d;--bg:#f3f5fa;--white:#fff;--green:#06b462;--line:#e9edf4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Bengali",sans-serif;max-width:480px;margin:auto;padding-bottom:82px}
+header{background:linear-gradient(135deg,#1849e9,#1035b8);color:white;padding:18px 16px 20px;border-radius:0 0 24px 24px;position:sticky;top:0;z-index:4;box-shadow:0 5px 18px #ff9b2430}
+.headrow{display:flex;align-items:center;justify-content:space-between}.brand{font-size:21px;font-weight:900;letter-spacing:.3px}.headbtn{border:0;background:#ffffff30;color:white;border-radius:12px;width:40px;height:40px;font-size:18px}
+.hello{margin-top:14px;font-size:13px;opacity:.95}.balance{background:white;color:var(--ink);margin-top:14px;border-radius:18px;padding:16px;box-shadow:0 8px 24px #6b778b15}.bal-label{font-size:12px;color:var(--muted)}.amount{font-size:30px;font-weight:900;margin:5px 0 12px}.balbuttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#5c16c5,#1849e9);color:white}.btn.secondary{background:#eef2ff;color:#1648e8}.btn.dark{background:#263449}.btn.green{background:var(--green)}.btn:disabled{opacity:.5}
+main{padding:14px}.section{display:none}.section.active{display:block}.titleline{display:flex;align-items:center;justify-content:space-between;margin:5px 2px 13px}.titleline h2{font-size:18px;margin:0}.small{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.tile,.card{background:white;border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:0 4px 14px #25334b08}.tile{display:flex;align-items:center;gap:11px;cursor:pointer}.tileicon{width:44px;height:44px;border-radius:14px;background:#eef2ff;display:grid;place-items:center;font-size:22px}.tile strong{display:block;font-size:13px}.tile small{color:var(--muted);font-size:11px}
+.card{margin-bottom:11px}.cardtop{display:flex;gap:12px;align-items:center}.avatar{width:45px;height:45px;border-radius:14px;background:#eef2ff;display:grid;place-items:center;font-size:22px;flex-shrink:0}.card h3{font-size:14px;margin:0 0 4px}.card p{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5}.rowbtn{display:flex;gap:8px;margin-top:12px}.rowbtn .btn{flex:1;font-size:12px;padding:10px}
+.pill{font-size:10px;padding:5px 8px;border-radius:20px;background:#e9f8ef;color:#16834e;font-weight:800}.adbox{background:linear-gradient(135deg,#eef2ff,#fff);border:1px dashed #8a2be2;border-radius:16px;padding:17px;text-align:center;margin-bottom:12px}.adbox .ademoji{font-size:34px}.adbox h3{margin:8px 0}.adbox p{font-size:12px;color:var(--muted)}
+input,textarea,select{width:100%;border:1px solid #dfe5ee;background:#fafbfe;border-radius:11px;padding:11px;font:inherit;font-size:13px;margin:5px 0 10px}label{font-size:12px;font-weight:700}.formcard{background:white;border-radius:16px;padding:15px;margin-bottom:12px}.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:10}.nav{border:0;background:transparent;color:#8992a3;font-size:10px;font-weight:700;padding:5px 0;cursor:pointer}.nav span{display:block;font-size:20px;margin-bottom:3px}.nav.active{color:#1648e8}.notice{background:#eef2ff;border:1px solid #cbd5ff;color:#344a91;border-radius:12px;padding:11px;font-size:12px;line-height:1.5;margin-bottom:12px}.hidden{display:none!important}.profileline{display:flex;align-items:center;gap:12px}.bigavatar{width:54px;height:54px;border-radius:50%;background:#eef2ff;display:grid;place-items:center;font-size:25px}
+
+/* Original Taka Bazar blue + purple palette overrides */
+:root{--orange:#1648e8;--orange2:#5c16c5;--bg-light:#f3f5fa;--primary-blue:#1648e8;--purple-grad-1:#5c16c5;--purple-grad-2:#8a2be2;--green-btn:#06b462}
+header{background:linear-gradient(135deg,#1849e9,#1035b8)!important}
+.balance{background:linear-gradient(135deg,#4b15b8,#7c1fd1 55%,#9b26ea)!important;color:#fff!important}
+.balance .bal-label{color:#fff!important;opacity:.9}
+.balance .amount{color:#fff!important}
+.btn{background:linear-gradient(135deg,#5c16c5,#1849e9)!important}
+.btn.secondary{background:#fff!important;color:#1648e8!important}
+.tileicon,.avatar,.bigavatar{background:#eef2ff!important}
+.nav.active{color:#1648e8!important}
+
+</style>
+</head>
+<body>
+<div id="joinGate" style="display:none;position:fixed;inset:0;z-index:9999;background:#f3f5fa;overflow:auto;padding:24px 16px;text-align:center">
+ <div style="max-width:440px;margin:24px auto;background:white;border-radius:22px;padding:22px;box-shadow:0 10px 30px #1e243820">
+  <div style="font-size:34px">🔐</div><h2 style="color:#1648e8;margin:10px 0">Taka Bazar Verification</h2>
+  <p style="font-size:13px;color:#6c758d;line-height:1.6">প্রথমে অ্যাডমিন যোগ করা Telegram চ্যানেলগুলোতে Join করুন, তারপর Verify চাপুন।</p>
+  <div id="gateChannels" style="text-align:left;margin:16px 0"></div>
+  <button class="btn" style="width:100%" onclick="verifyChannelGate()">Verify & Continue</button>
+  <p id="gateMessage" style="font-size:12px;color:#e63946;margin-top:12px"></p>
+ </div>
+</div>
+<header>
+ <div class="headrow"><button class="headbtn" onclick="show('profile')" aria-label="Profile">👤</button><div class="brand">🛍️ TAKA BAZAR</div><button class="headbtn" onclick="show('admin')" aria-label="Settings">⚙️</button></div>
+ <div class="hello">Welcome back, <b id="userName">Taka Bazar User</b> ✨</div>
+ <div class="balance"><div class="bal-label">Available Balance</div><div class="amount">৳ <span id="balance">0.00</span></div><div class="balbuttons"><button class="btn" onclick="show('withdraw')">Withdraw</button><button class="btn secondary" onclick="show('refer')">👥 Refer & Earn</button></div></div>
+</header>
+<main>
+<section id="home" class="section active">
+ <div class="titleline"><h2>Quick Earn</h2><span class="small">Earn • Shop • Grow</span></div>
+ <div class="grid">
+  <div class="tile" onclick="show('channels')"><div class="tileicon">📢</div><div><strong>Join Channels</strong><small>Join & verify</small></div></div>
+  <div class="tile" onclick="show('ads')"><div class="tileicon">▶️</div><div><strong>Watch Ads</strong><small>Ad rewards</small></div></div>
+  <div class="tile" onclick="show('tasks')"><div class="tileicon">🎯</div><div><strong>Daily Tasks</strong><small>Complete tasks</small></div></div>
+  <div class="tile" onclick="show('quiz')"><div class="tileicon">🏆</div><div><strong>Play Quiz</strong><small>Test your knowledge</small></div></div>
+  <div class="tile" onclick="show('bonus')"><div class="tileicon">🎁</div><div><strong>Daily Bonus</strong><small>Daily check-in</small></div></div>
+  <div class="tile" onclick="show('leaderboard')"><div class="tileicon">🥇</div><div><strong>Leaderboard</strong><small>Top earners</small></div></div>
+ </div>
+ <div class="titleline" style="margin-top:22px"><h2>Featured Tasks</h2><button class="small" onclick="show('tasks')">See all ›</button></div><div id="homeTasks"></div>
+</section>
+<section id="channels" class="section"><div class="titleline"><h2>📢 Join Channels</h2><span class="pill">Unlock access</span></div><div class="notice">Join the channels added by the admin. After joining, tap Verify. A real Telegram membership check requires a connected bot backend.</div><div id="channelList"></div></section>
+<section id="ads" class="section"><div class="titleline"><h2>▶️ Advertisement Center</h2><span class="small">Admin added ads</span></div><div class="notice">Ads and reward values are configured by your admin. This static HTML demo cannot verify real ad views or safely credit money.</div><div id="adList"></div></section>
+<section id="tasks" class="section"><div class="titleline"><h2>🎯 All Tasks</h2><span class="small">Complete & claim</span></div><div id="taskList"></div></section>
+<section id="refer" class="section"><div class="titleline"><h2>👥 Refer & Earn</h2></div><div class="card"><h3>Invite friends to Taka Bazar</h3><p>Share your referral link with friends. Referral rewards can be enabled by the admin.</p><button class="btn" onclick="shareReferral()">Share Referral Link</button></div></section>
+<section id="leaderboard" class="section"><div class="titleline"><h2>🏆 Leaderboard</h2></div><div class="card"><p>Leaderboard will display verified users and their confirmed rewards when connected to a database.</p><div class="notice">Demo view: real-time ranking needs backend data.</div></div></section>
+<section id="support" class="section"><div class="titleline"><h2>💬 Support</h2></div><div class="card"><h3>Need help?</h3><p>Contact the Taka Bazar support team.</p><button class="btn" onclick="openSupport()">Open Support</button></div></section>
+<section id="profile" class="section"><div class="titleline"><h2>My Profile</h2></div><div class="card profileline"><div class="bigavatar">👤</div><div><h3 id="profileName">Telegram User</h3><p id="profileId">Telegram ID not available</p></div></div><div class="card"><p>Account and wallet details are shown here. Secure account syncing requires backend integration.</p></div></section>
+<section id="withdraw" class="section"><div class="titleline"><h2>💸 Withdraw</h2></div><div class="notice">Withdrawal requests must be stored and reviewed by a secure backend/admin. This screen is a front-end form only.</div><div class="formcard"><label>Payment Method</label><select id="payMethod"><option>bKash</option><option>Nagad</option><option>Rocket</option></select><label>Account Number</label><input id="payNumber" placeholder="01XXXXXXXXX"><label>Amount (৳)</label><input id="payAmount" type="number" min="1" placeholder="Enter amount"><button class="btn" onclick="submitWithdraw()">Submit Request (Demo)</button><p id="withdrawMsg" class="small"></p></div></section>
+<section id="quiz" class="section"><div class="titleline"><h2>🏆 Quiz</h2></div><div class="card"><p>Quiz questions are managed by the admin in the connected quiz system.</p><button class="btn" onclick="alert('Connect your existing quiz module here.')">Open Quiz</button></div></section>
+<section id="bonus" class="section"><div class="titleline"><h2>🎁 Daily Bonus</h2></div><div class="card"><p>Daily bonus settings and claim verification should be controlled by your backend.</p><button class="btn" onclick="alert('Daily bonus backend is not connected in this HTML demo.')">Claim Daily Bonus</button></div></section>
+<section id="admin" class="section"><div class="titleline"><h2>⚙️ Admin Setup</h2><span class="pill">Local demo</span></div><div class="notice">This setup saves on this browser only. It is not a secure admin login. Add your own channel, ad, and task links here; then users see them in the app.</div>
+ <div class="formcard"><h3>➕ Add Telegram Channel</h3><label>Channel Name</label><input id="chName" placeholder="My Telegram Channel"><label>Channel URL</label><input id="chUrl" placeholder="https://t.me/channelname"><label>Reward (৳ label)</label><input id="chReward" type="number" placeholder="5"><button class="btn" onclick="addItem('channels')">Add Channel</button></div>
+ <div class="formcard"><h3>➕ Add Task</h3><label>Task Title</label><input id="taskName" placeholder="Follow our channel"><label>Description</label><input id="taskDesc" placeholder="Complete the task to claim"><label>Task Link</label><input id="taskUrl" placeholder="https://..."><label>Reward label</label><input id="taskReward" type="number" placeholder="10"><button class="btn" onclick="addItem('tasks')">Add Task</button></div>
+ <div class="formcard"><h3>➕ Add Advertisement</h3><label>Ad Title</label><input id="adName" placeholder="Sponsored promotion"><label>Ad Link</label><input id="adUrl" placeholder="https://..."><label>Reward label</label><input id="adReward" type="number" placeholder="2"><button class="btn" onclick="addItem('ads')">Add Ad</button></div>
+ <div class="formcard"><h3>⚙️ General Settings</h3><label>Support Telegram URL</label><input id="supportUrl" placeholder="https://t.me/your_support"><label>Referral link base / bot link</label><input id="refUrl" placeholder="https://t.me/your_bot"><button class="btn" onclick="saveSettings()">Save Settings</button></div>
+ <div class="formcard"><h3>Manage Added Items</h3><div id="adminItems"></div><button class="btn dark" onclick="resetDemo()">Reset local demo data</button></div>
+</section>
+</main>
+<nav class="bottom">
+<button class="nav active" data-page="home" onclick="show('home',this)"><span>⌂</span>Home</button>
+<button class="nav" data-page="ads" onclick="show('ads',this)"><span>▶</span>Ads</button>
+<button class="nav" data-page="refer" onclick="show('refer',this)"><span>♧</span>Refer</button>
+<button class="nav" data-page="leaderboard" onclick="show('leaderboard',this)"><span>♛</span>Ranks</button>
+<button class="nav" data-page="support" onclick="show('support',this)"><span>☏</span>Support</button>
+</nav>
+<script>
+const tg=window.Telegram?.WebApp;try{tg?.ready();tg?.expand()}catch(e){}
+const tgUser=tg?.initDataUnsafe?.user;
+const initial={channels:[],tasks:[],ads:[],settings:{supportUrl:"",refUrl:""},claimed:[]};
+let db;try{db=JSON.parse(localStorage.getItem("takaBazarDemo")||"null")||structuredClone(initial)}catch(e){db=JSON.parse(JSON.stringify(initial))}
+function save(){localStorage.setItem("takaBazarDemo",JSON.stringify(db));render()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function show(id,btn){document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",x.id===id));document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===id));if(btn)btn.classList.add("active");window.scrollTo(0,0);if(id==="admin")renderAdmin()}
+function card(item,type,i){let icon=type==="channels"?"📢":type==="ads"?"▶️":"🎯";let claimed=db.claimed.includes(type+":"+i);return `<div class="card"><div class="cardtop"><div class="avatar">${icon}</div><div style="flex:1"><h3>${esc(item.name)}</h3><span class="pill">${claimed?"Completed":"Reward ৳"+esc(item.reward||0)}</span></div></div><p>${esc(item.desc||"Open the link and complete the activity.")}</p><div class="rowbtn"><button class="btn secondary" onclick="openLink('${esc(item.url)}')">${type==="channels"?"Join Channel":type==="ads"?"Open Ad":"Start Task"}</button><button class="btn green" onclick="claim('${type}',${i})" ${claimed?"disabled":""}>${claimed?"Claimed":"Verify / Claim"}</button></div></div>`}
+function render(){document.getElementById("channelList").innerHTML=db.channels.length?db.channels.map((x,i)=>card(x,"channels",i)).join(""):`<div class="card"><p>No channels added yet. Admin can add channel links from ⚙️ Admin Setup.</p></div>`;
+document.getElementById("taskList").innerHTML=db.tasks.length?db.tasks.map((x,i)=>card(x,"tasks",i)).join(""):`<div class="card"><p>No tasks available yet.</p></div>`;
+document.getElementById("adList").innerHTML=db.ads.length?db.ads.map((x,i)=>`<div class="adbox"><div class="ademoji">📺</div><h3>${esc(x.name)}</h3><p>Reward label: ৳${esc(x.reward||0)}</p><button class="btn" onclick="openLink('${esc(x.url)}')">Open Advertisement</button><button class="btn green" style="margin-top:8px" onclick="claim('ads',${i})" ${db.claimed.includes("ads:"+i)?"disabled":""}>${db.claimed.includes("ads:"+i)?"Claimed":"Claim (Demo)"}</button></div>`).join(""):`<div class="card"><p>No ads added yet. Admin can add ad links.</p></div>`;
+document.getElementById("homeTasks").innerHTML=db.tasks.slice(0,3).map((x,i)=>card(x,"tasks",i)).join("")||`<div class="card"><p>Admin-added tasks will appear here.</p></div>`;
+document.getElementById("balance").textContent=(Number(localStorage.getItem("takaDemoBalance")||0)).toFixed(2);
+document.getElementById("userName").textContent=tgUser?.first_name||"Taka Bazar User";document.getElementById("profileName").textContent=[tgUser?.first_name,tgUser?.last_name].filter(Boolean).join(" ")||"Telegram User";document.getElementById("profileId").textContent=tgUser?.id?"Telegram ID: "+tgUser.id:"Telegram ID not available";
+if(document.getElementById("supportUrl"))document.getElementById("supportUrl").value=db.settings.supportUrl||"";if(document.getElementById("refUrl"))document.getElementById("refUrl").value=db.settings.refUrl||""}
+function openLink(url){if(!url||!/^https?:\/\//i.test(url)){alert("Admin has not set a valid link.");return}if(tg?.openTelegramLink&&url.includes("t.me/"))tg.openTelegramLink(url);else window.open(url,"_blank")}
+function claim(type,i){let key=type+":"+i;if(db.claimed.includes(key))return;db.claimed.push(key);save();alert("Demo status updated. Real rewards require backend verification.");}
+function addItem(type){let item;if(type==="channels")item={name:chName.value.trim(),url:chUrl.value.trim(),reward:chReward.value};if(type==="tasks")item={name:taskName.value.trim(),desc:taskDesc.value.trim(),url:taskUrl.value.trim(),reward:taskReward.value};if(type==="ads")item={name:adName.value.trim(),url:adUrl.value.trim(),reward:adReward.value};if(!item.name||!item.url){alert("Please enter a name and URL.");return}db[type].push(item);["chName","chUrl","chReward","taskName","taskDesc","taskUrl","taskReward","adName","adUrl","adReward"].forEach(id=>{let e=document.getElementById(id);if(e)e.value=""});save();alert("Added to this browser's local demo.");}
+function renderAdmin(){let all=[...db.channels.map((x,i)=>({x,type:"channels",i,tag:"Channel"})),...db.tasks.map((x,i)=>({x,type:"tasks",i,tag:"Task"})),...db.ads.map((x,i)=>({x,type:"ads",i,tag:"Ad"}))];document.getElementById("adminItems").innerHTML=all.map(a=>`<div class="card"><p><b>${a.tag}:</b> ${esc(a.x.name)}</p><button class="btn dark" onclick="removeItem('${a.type}',${a.i})">Delete</button></div>`).join("")||"<p class='small'>No items yet.</p>"}
+function removeItem(type,i){if(confirm("Delete this item?")){db[type].splice(i,1);db.claimed=[];save();renderAdmin()}}
+function saveSettings(){db.settings.supportUrl=supportUrl.value.trim();db.settings.refUrl=refUrl.value.trim();save();alert("Settings saved locally.")}
+function openSupport(){openLink(db.settings.supportUrl)}
+function shareReferral(){let url=db.settings.refUrl||"https://t.me/";let share="Join Taka Bazar: "+url;if(tg?.openTelegramLink)tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent("Join Taka Bazar"));else if(navigator.share)navigator.share({text:share});else prompt("Copy referral link",url)}
+function submitWithdraw(){withdrawMsg.textContent="Demo form only. Connect a secure backend before accepting real withdrawals."}
+function resetDemo(){if(confirm("Clear locally saved channels, tasks and ads?")){localStorage.removeItem("takaBazarDemo");db=JSON.parse(JSON.stringify(initial));save();renderAdmin()}}
+
+// Telegram user identity and admin-only panel visibility (UI restriction; backend must enforce authorization).
+const ADMIN_TELEGRAM_ID = "8837055672";
+const ADMIN_USERNAME = "income1i2";
+const isAdmin = !!tgUser && String(tgUser.id)===ADMIN_TELEGRAM_ID &&
+  String(tgUser.username||"").replace(/^@/,"").toLowerCase()===ADMIN_USERNAME;
+document.querySelectorAll(".headbtn")[1]?.classList.toggle("hidden",!isAdmin);
+const adminSection=document.getElementById("admin");
+if(!isAdmin && adminSection){adminSection.innerHTML='<div class="card"><h3>Admin access restricted</h3><p>Only the authorized Telegram account can open admin controls.</p></div>';}
+function renderGate(){
+ const gate=document.getElementById("joinGate");
+ if(!gate)return;
+ const channels=db.channels||[];
+ document.getElementById("gateChannels").innerHTML=channels.length?channels.map((c,i)=>`<div class="card"><b>${esc(c.name)}</b><div style="margin-top:10px"><button class="btn secondary" onclick="openLink('${esc(c.url)}')">Join Channel</button></div></div>`).join(""):'<div class="notice">Admin has not configured any required channels yet.</div>';
+ gate.style.display="block";
+}
+async function verifyChannelGate(){
+ const msg=document.getElementById("gateMessage");
+ // Configure a server endpoint that validates Telegram WebApp initData and checks bot membership.
+ const VERIFY_API_URL = ""; // Add your HTTPS backend endpoint here.
+ if(!tg || !tg.initData){msg.textContent="Telegram Mini App-এর ভিতর থেকে খুলুন।";return;}
+ if(!db.channels.length){msg.textContent="Required channels এখনো admin সেট করেনি।";return;}
+ if(!VERIFY_API_URL){msg.textContent="Secure channel verification চালু করতে backend API দরকার। শুধু Join বাটন চাপলে verified হবে না।";return;}
+ try{
+  const r=await fetch(VERIFY_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({initData:tg.initData,channels:db.channels.map(c=>c.url)})});
+  const data=await r.json();
+  if(r.ok&&data.verified===true){sessionStorage.setItem("takaBazarVerified","1");document.getElementById("joinGate").style.display="none";}
+  else msg.textContent="সব required channel-এ Join করে আবার Verify করুন।";
+ }catch(e){msg.textContent="Verification server-এর সাথে সংযোগ হচ্ছে না। পরে চেষ্টা করুন।";}
+}
+if(!tgUser){renderGate();}
+else if(sessionStorage.getItem("takaBazarVerified")!=="1"){renderGate();}
+render();
+</script>
+</body></html>
